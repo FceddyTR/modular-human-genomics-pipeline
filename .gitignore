@@ -1,0 +1,66 @@
+# ============================================================
+# MODULAR HUMAN GENOMICS PIPELINE
+# Local genomic data and sensitive files must never be tracked
+# ============================================================
+
+# Raw sequencing data
+data/
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+
+# Alignment files
+*.sam
+*.bam
+*.bai
+*.cram
+*.crai
+
+# Variant files
+*.vcf
+*.vcf.gz
+*.vcf.gz.tbi
+*.bcf
+
+# Reference genome and local databases
+reference/
+resources/private/
+*.fa
+*.fasta
+*.fna
+*.fai
+*.dict
+
+# Pipeline outputs
+results/
+logs/
+
+# Nextflow
+work/
+.nextflow/
+.nextflow.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Conda / Python
+.conda/
+env/
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets / credentials
+.env
+*.key
+*.pem
+credentials*
+secrets*
+
+# IDE / OS
+.vscode/
+.DS_Store
+Thumbs.db
