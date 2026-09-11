@@ -7,12 +7,27 @@ channels:
 dependencies:
   - python=3.12
   - openjdk=17
+
+  # Workflow
   - nextflow
+
+  # Raw sequencing QC
   - fastqc
   - multiqc
+  - seqkit
+
+  # Alignment
+  - bwa
   - bwa-mem2
+  - samblaster
+
+  # BAM / genomic utilities
   - samtools
   - bcftools
   - bedtools
-  - seqkit
   - htslib
+  - mosdepth
+
+  # Python
+  - pyyaml
+  - pytest

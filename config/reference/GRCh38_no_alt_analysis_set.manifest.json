@@ -1,0 +1,43 @@
+{
+  "manifest_version": "0.1.0",
+  "author": "Efe M\u0131hc\u0131",
+  "generated_at": "2026-09-11T20:36:21.305575+00:00",
+  "reference": {
+    "file": "GRCh38_no_alt_analysis_set.fasta",
+    "size_bytes": 3144230986,
+    "sha256": "9cce8b926416dd96b152deea85188495b75f7ac8d634cc723a017067be8702b7",
+    "fai_file": "GRCh38_no_alt_analysis_set.fasta.fai",
+    "fai_sha256": "502a1b8fb73ccd53285c28a0f12df90c818b4fe3de1e862ef47c593ef1a0a4b4",
+    "contig_count": 195,
+    "total_reference_bases": 3099922541,
+    "missing_primary_contigs": []
+  },
+  "bwa_index": [
+    {
+      "file": "GRCh38_no_alt_analysis_set.fasta.amb",
+      "exists": true,
+      "size_bytes": 17478
+    },
+    {
+      "file": "GRCh38_no_alt_analysis_set.fasta.ann",
+      "exists": true,
+      "size_bytes": 27715
+    },
+    {
+      "file": "GRCh38_no_alt_analysis_set.fasta.bwt",
+      "exists": true,
+      "size_bytes": 3099922624
+    },
+    {
+      "file": "GRCh38_no_alt_analysis_set.fasta.pac",
+      "exists": true,
+      "size_bytes": 774980637
+    },
+    {
+      "file": "GRCh38_no_alt_analysis_set.fasta.sa",
+      "exists": true,
+      "size_bytes": 1549961320
+    }
+  ],
+  "status": "PASS"
+}

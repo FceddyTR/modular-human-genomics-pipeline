@@ -1,2 +1,2 @@
 sample_id,fastq_1,fastq_2
-HG002,data/HG002_R1.fastq.gz,data/HG002_R2.fastq.gz
+HG002,data/HG002/raw/HG002.novaseq.pcr-free.35x.R1.fastq.gz,data/HG002/raw/HG002.novaseq.pcr-free.35x.R2.fastq.gz

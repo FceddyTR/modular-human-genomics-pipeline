@@ -1,0 +1,62 @@
+version: "0.2.0"
+
+profiles:
+
+  smoke:
+    name: "Smoke Test"
+    description: >
+      Small downsampled dataset used to validate workflow execution,
+      alignment integrity, BAM generation, indexing and QC reporting.
+      Genome-wide coverage sufficiency is intentionally not assessed.
+
+    intended_use: "pipeline_smoke_testing"
+    clinically_validated: false
+    coverage_applicable: false
+
+    thresholds:
+
+      mapping_rate_pct:
+        warn_below: 98.0
+        fail_below: 95.0
+
+      properly_paired_pct:
+        warn_below: 95.0
+        fail_below: 90.0
+
+      duplicate_rate_pct:
+        warn_above: 10.0
+        fail_above: 20.0
+
+
+  wgs35x:
+    name: "Development WGS 35x"
+    description: >
+      Development profile for approximately 35x germline whole-genome
+      sequencing. Thresholds are research and pipeline-development
+      thresholds and are not clinically validated acceptance criteria.
+
+    intended_use: "research_and_pipeline_validation"
+    clinically_validated: false
+    coverage_applicable: true
+
+    thresholds:
+
+      mapping_rate_pct:
+        warn_below: 98.0
+        fail_below: 95.0
+
+      properly_paired_pct:
+        warn_below: 95.0
+        fail_below: 90.0
+
+      duplicate_rate_pct:
+        warn_above: 10.0
+        fail_above: 20.0
+
+      mean_autosomal_coverage:
+        warn_below: 28.0
+        fail_below: 20.0
+
+      genome_20x_fraction_pct:
+        warn_below: 90.0
+        fail_below: 80.0

@@ -4,7 +4,7 @@
 # ============================================================
 
 # Raw sequencing data
-data/
+/data/
 *.fastq
 *.fastq.gz
 *.fq
@@ -24,7 +24,7 @@ data/
 *.bcf
 
 # Reference genome and local databases
-reference/
+/reference/
 resources/private/
 *.fa
 *.fasta
@@ -33,16 +33,16 @@ resources/private/
 *.dict
 
 # Pipeline outputs
-results/
-logs/
+/results/
+/logs/
 
 # Nextflow
-work/
+/work/
 .nextflow/
 .nextflow.log*
 
 # Temporary files
-tmp/
+/tmp/
 temp/
 *.tmp
 
@@ -64,3 +64,5 @@ secrets*
 .vscode/
 .DS_Store
 Thumbs.db
+*.py[cod]
+.pytest_cache/

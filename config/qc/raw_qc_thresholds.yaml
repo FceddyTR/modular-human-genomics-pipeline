@@ -1,0 +1,23 @@
+version: "0.1.0"
+
+paired_end:
+  max_read_count_difference_pct:
+    warn: 0.5
+    fail: 2.0
+
+fastqc_modules:
+  critical:
+    - "Per base sequence quality"
+    - "Per sequence quality scores"
+    - "Adapter Content"
+
+  warning_only:
+    - "Sequence Duplication Levels"
+    - "Overrepresented sequences"
+    - "Per base sequence content"
+    - "Per sequence GC content"
+
+basic_statistics:
+  minimum_total_sequences:
+    warn: 1000000
+    fail: 100000
