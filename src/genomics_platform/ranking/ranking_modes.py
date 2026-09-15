@@ -9,7 +9,12 @@ class RankingMode(str, Enum):
     """Supported candidate prioritization modes."""
 
     VARIANT_FIRST = "variant_first"
+
+    # Backward-compatible exact-HPO phenotype mode.
     PHENOTYPE = "phenotype"
+
+    # Ontology-aware phenotype mode using semantic similarity.
+    PHENOTYPE_SEMANTIC = "phenotype_semantic"
 
 
 def normalize_ranking_mode(
@@ -27,6 +32,7 @@ def normalize_ranking_mode(
 
     try:
         return RankingMode(normalized)
+
     except ValueError as exc:
         allowed = ", ".join(
             mode.value

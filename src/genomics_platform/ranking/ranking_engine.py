@@ -23,9 +23,15 @@ from genomics_platform.ranking.components.evidence_components import (
     gene_disease_component,
     inheritance_component,
 )
+from genomics_platform.ranking.components.semantic_phenotype_component import (
+    semantic_phenotype_component,
+)
+from genomics_platform.phenotype.hpo_semantic_similarity import (
+    HPOSemanticSimilarity,
+)
 
 
-ENGINE_VERSION = "0.2.0"
+ENGINE_VERSION = "0.3.0"
 
 MODE_WEIGHTS = {
     RankingMode.VARIANT_FIRST: {
@@ -37,6 +43,14 @@ MODE_WEIGHTS = {
         "phenotype": 0.0,
     },
     RankingMode.PHENOTYPE: {
+        "clinical": 20.0,
+        "population": 15.0,
+        "functional": 10.0,
+        "gene_disease": 20.0,
+        "inheritance": 15.0,
+        "phenotype": 20.0,
+    },
+    RankingMode.PHENOTYPE_SEMANTIC: {
         "clinical": 20.0,
         "population": 15.0,
         "functional": 10.0,
@@ -194,6 +208,7 @@ def _phenotype_component(
 def _evaluate(
     candidate: CandidateCase,
     mode: RankingMode,
+    semantic_engine: HPOSemanticSimilarity | None = None,
 ):
     weights = MODE_WEIGHTS[mode]
 
@@ -233,9 +248,18 @@ def _evaluate(
             candidate,
             weights["inheritance"],
         ),
-        _phenotype_component(
-            candidate,
-            weights["phenotype"],
+        (
+            semantic_phenotype_component(
+                candidate,
+                weights["phenotype"],
+                semantic_engine,
+            )
+            if mode
+            == RankingMode.PHENOTYPE_SEMANTIC
+            else _phenotype_component(
+                candidate,
+                weights["phenotype"],
+            )
         ),
     )
 
@@ -259,10 +283,20 @@ def rank_candidates(
     mode: str | RankingMode = (
         RankingMode.VARIANT_FIRST
     ),
+    semantic_engine: HPOSemanticSimilarity | None = None,
 ) -> RankingResult:
     mode = normalize_ranking_mode(
         mode
     )
+
+    if (
+        mode == RankingMode.PHENOTYPE_SEMANTIC
+        and semantic_engine is None
+    ):
+        raise ValueError(
+            "semantic_engine is required for "
+            "phenotype_semantic ranking mode."
+        )
 
     candidates = tuple(candidates)
 
@@ -285,6 +319,7 @@ def rank_candidates(
             _evaluate(
                 candidate,
                 mode,
+                semantic_engine,
             )
         )
 
