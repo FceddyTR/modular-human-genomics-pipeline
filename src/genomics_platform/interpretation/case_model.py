@@ -311,6 +311,60 @@ class CandidateCase:
         )
 
     @property
+    def contract_genes(
+        self,
+    ) -> tuple[str, ...]:
+        genes = getattr(
+            self.evidence_contract.functional,
+            "genes",
+            (),
+        )
+
+        if genes is None:
+            return ()
+
+        return tuple(
+            sorted(
+                {
+                    str(gene).strip().upper()
+                    for gene in genes
+                    if str(gene).strip()
+                }
+            )
+        )
+
+    @property
+    def gene_consistency(self) -> str:
+        """Relationship between candidate gene and VEP genes.
+
+        MATCH:
+            candidate gene occurs in functional annotation.
+
+        MISMATCH:
+            both sides contain gene information but disagree.
+
+        UNKNOWN:
+            candidate gene or functional gene annotation is absent.
+
+        This is an identity/integrity check, not biological
+        pathogenicity evidence.
+        """
+
+        if (
+            self.gene_symbol is None
+            or not self.contract_genes
+        ):
+            return "UNKNOWN"
+
+        if (
+            self.gene_symbol
+            in self.contract_genes
+        ):
+            return "MATCH"
+
+        return "MISMATCH"
+
+    @property
     def available_dimensions(
         self,
     ) -> tuple[str, ...]:
@@ -342,6 +396,17 @@ class CandidateCase:
             ),
             "variant_key": self.variant_key,
             "gene_symbol": self.gene_symbol,
+            "gene_consistency": {
+                "status": self.gene_consistency,
+                "candidate_gene": self.gene_symbol,
+                "contract_genes": list(
+                    self.contract_genes
+                ),
+                "meaning": (
+                    "Identity consistency check only; "
+                    "not pathogenicity evidence."
+                ),
+            },
             "case_context": (
                 self.case_context.to_dict()
             ),

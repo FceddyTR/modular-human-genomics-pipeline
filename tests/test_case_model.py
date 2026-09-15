@@ -244,3 +244,68 @@ def test_wrong_profile_type_rejected():
             evidence_contract=contract,
             interpretation_profile={},
         )
+
+
+def test_gene_consistency_detects_current_fixture_mismatch():
+    candidate = make_candidate()
+
+    assert candidate.gene_symbol == "NCSTN"
+    assert "OR4F5" in candidate.contract_genes
+    assert (
+        candidate.gene_consistency
+        == "MISMATCH"
+    )
+
+
+def test_gene_consistency_serializes():
+    data = make_candidate().to_dict()
+
+    consistency = data[
+        "gene_consistency"
+    ]
+
+    assert (
+        consistency["status"]
+        == "MISMATCH"
+    )
+
+    assert (
+        consistency["candidate_gene"]
+        == "NCSTN"
+    )
+
+    assert "OR4F5" in (
+        consistency["contract_genes"]
+    )
+
+
+def test_missing_candidate_gene_is_unknown():
+    contract = make_contract()
+    profile = interpret_variant(contract)
+
+    candidate = build_candidate_case(
+        candidate_id="candidate",
+        evidence_contract=contract,
+        interpretation_profile=profile,
+    )
+
+    assert (
+        candidate.gene_consistency
+        == "UNKNOWN"
+    )
+
+
+def test_gene_consistency_is_not_pathogenicity():
+    data = make_candidate().to_dict()
+
+    consistency = data[
+        "gene_consistency"
+    ]
+
+    assert (
+        "pathogenic"
+        not in consistency["meaning"].lower()
+        or "not pathogenicity" in (
+            consistency["meaning"].lower()
+        )
+    )
