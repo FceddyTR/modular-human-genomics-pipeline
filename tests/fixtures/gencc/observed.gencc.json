@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "importer": {
+    "name": "gencc_importer",
+    "version": "0.1.0"
+  },
+  "source": {
+    "name": "GenCC",
+    "license": "CC0-1.0",
+    "format": "new"
+  },
+  "summary": {
+    "record_count": 2,
+    "unique_genes": 2,
+    "unique_diseases": 2,
+    "classifications": {
+      "Definitive": 1,
+      "Strong": 1
+    }
+  },
+  "records": [
+    {
+      "schema_version": "1.1",
+      "source": "GenCC",
+      "evidence_type": "gene_disease_validity",
+      "gene_symbol": "TESTGENE1",
+      "gene_id": "HGNC:11111",
+      "disease_id": "MONDO:0000001",
+      "disease_name": "Synthetic disorder one",
+      "phenotype_ids": [],
+      "inheritance": [
+        "Autosomal dominant"
+      ],
+      "classification": "Definitive",
+      "confidence": "Definitive",
+      "frequency": null,
+      "source_record_id": "SGC-TEST001",
+      "source_version": "2",
+      "source_release": "2026-08-01",
+      "citations": [
+        "12345678"
+      ],
+      "evidence_description": "Submitted by ClinGen. Gene-disease validity classification: Definitive",
+      "license": "CC0-1.0"
+    },
+    {
+      "schema_version": "1.1",
+      "source": "GenCC",
+      "evidence_type": "gene_disease_validity",
+      "gene_symbol": "TESTGENE2",
+      "gene_id": "HGNC:22222",
+      "disease_id": "MONDO:0000002",
+      "disease_name": "Synthetic disorder two",
+      "phenotype_ids": [],
+      "inheritance": [
+        "Autosomal recessive"
+      ],
+      "classification": "Strong",
+      "confidence": "Strong",
+      "frequency": null,
+      "source_record_id": "SGC-TEST002",
+      "source_version": "1",
+      "source_release": "2026-08-02",
+      "citations": [
+        "23456789",
+        "34567890"
+      ],
+      "evidence_description": "Submitted by Test Submitter. Gene-disease validity classification: Strong",
+      "license": "CC0-1.0"
+    }
+  ]
+}

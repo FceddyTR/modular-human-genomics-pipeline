@@ -1,0 +1,44 @@
+{
+  "count": 2,
+  "results": [
+    {
+      "entity_name": "TESTGENE",
+      "entity_type": "gene",
+      "confidence_level": "3",
+      "mode_of_inheritance": "MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted",
+      "phenotypes": [
+        "Synthetic inflammatory disease"
+      ],
+      "publications": [
+        "12345678"
+      ],
+      "gene_data": {
+        "gene_symbol": "TESTGENE",
+        "hgnc_id": "999999"
+      },
+      "panel": {
+        "id": 101,
+        "name": "Synthetic inflammatory panel",
+        "version": "2.1"
+      }
+    },
+    {
+      "entity_name": "OTHERGENE",
+      "entity_type": "gene",
+      "confidence_level": "2",
+      "mode_of_inheritance": "BIALLELIC, autosomal or pseudoautosomal",
+      "phenotypes": [
+        "Synthetic other disease"
+      ],
+      "gene_data": {
+        "gene_symbol": "OTHERGENE",
+        "hgnc_id": "888888"
+      },
+      "panel": {
+        "id": 102,
+        "name": "Other panel",
+        "version": "1.0"
+      }
+    }
+  ]
+}

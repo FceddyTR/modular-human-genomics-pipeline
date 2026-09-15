@@ -1,0 +1,27 @@
+{
+  "graphs": [
+    {
+      "nodes": [
+        {
+          "id": "http://purl.obolibrary.org/obo/MONDO_0001234",
+          "lbl": "synthetic inflammatory disease",
+          "meta": {
+            "xrefs": [
+              {"val": "OMIM:999001"},
+              {"val": "ORPHA:999002"}
+            ]
+          }
+        },
+        {
+          "id": "http://purl.obolibrary.org/obo/MONDO_0005678",
+          "lbl": "synthetic neurological disease",
+          "meta": {
+            "xrefs": [
+              {"val": "OMIM:999003"}
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

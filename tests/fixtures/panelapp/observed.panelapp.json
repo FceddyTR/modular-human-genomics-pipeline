@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "adapter": {
+    "name": "panelapp_adapter",
+    "version": "0.1.0"
+  },
+  "source": {
+    "name": "PanelApp",
+    "endpoint": "https://panelapp.genomicsengland.co.uk/api/v1/entities/"
+  },
+  "query": {
+    "gene_symbol": "TESTGENE"
+  },
+  "status": "FOUND",
+  "summary": {
+    "record_count": 1,
+    "confidence_counts": {
+      "green": 1
+    }
+  },
+  "records": [
+    {
+      "schema_version": "1.1",
+      "source": "PanelApp",
+      "evidence_type": "expert_gene_panel",
+      "gene_symbol": "TESTGENE",
+      "gene_id": "HGNC:999999",
+      "disease_id": null,
+      "disease_name": "Synthetic inflammatory disease",
+      "phenotype_ids": [],
+      "inheritance": [
+        "MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted"
+      ],
+      "classification": null,
+      "confidence": "green",
+      "frequency": null,
+      "source_record_id": "panel:101|gene:TESTGENE",
+      "source_version": "2.1",
+      "source_release": null,
+      "citations": [
+        "12345678"
+      ],
+      "evidence_description": "PanelApp panel: Synthetic inflammatory panel. Phenotypes: Synthetic inflammatory disease",
+      "license": null
+    }
+  ]
+}

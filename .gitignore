@@ -66,3 +66,18 @@ secrets*
 Thumbs.db
 *.py[cod]
 .pytest_cache/
+
+# Local development artifacts
+*.zip
+*:Zone.Identifier
+README_PATCH.txt
+
+# Generated local evidence databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Generated local evidence databases
+*.sqlite
+*.sqlite3
+*.db

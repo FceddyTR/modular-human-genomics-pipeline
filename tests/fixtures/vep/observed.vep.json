@@ -1,0 +1,180 @@
+{
+  "schema_version": "1.0",
+  "parser": {
+    "name": "genomics_platform.vep_parser",
+    "version": "0.1.0"
+  },
+  "scope": {
+    "type": "functional_variant_annotation",
+    "clinical_classification": false,
+    "candidate_ranking": false,
+    "statement": "VEP consequence annotation only. This output is not ACMG/AMP classification and does not establish pathogenicity."
+  },
+  "input": {
+    "vcf": "/home/efe/projects/modular-human-genomics-pipeline/tests/fixtures/vep/synthetic.vep.vcf",
+    "samples": [
+      "SYNTHETIC"
+    ]
+  },
+  "vep": {
+    "csq_fields": [
+      "Allele",
+      "Consequence",
+      "IMPACT",
+      "SYMBOL",
+      "Gene",
+      "Feature_type",
+      "Feature",
+      "BIOTYPE",
+      "EXON",
+      "INTRON",
+      "ENSP",
+      "CANONICAL",
+      "VARIANT_CLASS"
+    ]
+  },
+  "summary": {
+    "variant_records": 2,
+    "transcript_annotations": 3,
+    "canonical_transcripts": 2,
+    "unique_genes": 3,
+    "genes": [
+      "GENE1",
+      "GENE2",
+      "GENE3"
+    ],
+    "impact_counts": {
+      "LOW": 1,
+      "MODERATE": 1,
+      "MODIFIER": 1
+    },
+    "consequence_counts": {
+      "downstream_gene_variant": 1,
+      "missense_variant": 1,
+      "synonymous_variant": 1
+    },
+    "gene_annotation_counts": {
+      "GENE1": 1,
+      "GENE2": 1,
+      "GENE3": 1
+    }
+  },
+  "variants": [
+    {
+      "variant_key": "chr20:10000000:A:G",
+      "chrom": "chr20",
+      "pos": 10000000,
+      "id": null,
+      "ref": "A",
+      "alt": [
+        "G"
+      ],
+      "qual": "60",
+      "filter": [
+        "PASS"
+      ],
+      "transcript_annotations": [
+        {
+          "Allele": "G",
+          "Consequence": "missense_variant",
+          "IMPACT": "MODERATE",
+          "SYMBOL": "GENE1",
+          "Gene": "ENSG000001",
+          "Feature_type": "Transcript",
+          "Feature": "ENST000001",
+          "BIOTYPE": "protein_coding",
+          "EXON": "3/10",
+          "INTRON": "",
+          "ENSP": "ENSP000001",
+          "CANONICAL": "YES",
+          "VARIANT_CLASS": "SNV",
+          "_normalized": {
+            "allele": "G",
+            "consequence": "missense_variant",
+            "impact": "MODERATE",
+            "symbol": "GENE1",
+            "gene_id": "ENSG000001",
+            "feature_type": "Transcript",
+            "transcript_id": "ENST000001",
+            "biotype": "protein_coding",
+            "protein_id": "ENSP000001",
+            "canonical": true,
+            "variant_class": "SNV"
+          }
+        }
+      ]
+    },
+    {
+      "variant_key": "chr20:10000100:C:T",
+      "chrom": "chr20",
+      "pos": 10000100,
+      "id": null,
+      "ref": "C",
+      "alt": [
+        "T"
+      ],
+      "qual": "50",
+      "filter": [
+        "PASS"
+      ],
+      "transcript_annotations": [
+        {
+          "Allele": "T",
+          "Consequence": "synonymous_variant",
+          "IMPACT": "LOW",
+          "SYMBOL": "GENE2",
+          "Gene": "ENSG000002",
+          "Feature_type": "Transcript",
+          "Feature": "ENST000002",
+          "BIOTYPE": "protein_coding",
+          "EXON": "5/8",
+          "INTRON": "",
+          "ENSP": "ENSP000002",
+          "CANONICAL": "YES",
+          "VARIANT_CLASS": "SNV",
+          "_normalized": {
+            "allele": "T",
+            "consequence": "synonymous_variant",
+            "impact": "LOW",
+            "symbol": "GENE2",
+            "gene_id": "ENSG000002",
+            "feature_type": "Transcript",
+            "transcript_id": "ENST000002",
+            "biotype": "protein_coding",
+            "protein_id": "ENSP000002",
+            "canonical": true,
+            "variant_class": "SNV"
+          }
+        },
+        {
+          "Allele": "T",
+          "Consequence": "downstream_gene_variant",
+          "IMPACT": "MODIFIER",
+          "SYMBOL": "GENE3",
+          "Gene": "ENSG000003",
+          "Feature_type": "Transcript",
+          "Feature": "ENST000003",
+          "BIOTYPE": "protein_coding",
+          "EXON": "",
+          "INTRON": "",
+          "ENSP": "",
+          "CANONICAL": "",
+          "VARIANT_CLASS": "SNV",
+          "_normalized": {
+            "allele": "T",
+            "consequence": "downstream_gene_variant",
+            "impact": "MODIFIER",
+            "symbol": "GENE3",
+            "gene_id": "ENSG000003",
+            "feature_type": "Transcript",
+            "transcript_id": "ENST000003",
+            "biotype": "protein_coding",
+            "protein_id": "",
+            "canonical": false,
+            "variant_class": "SNV"
+          }
+        }
+      ]
+    }
+  ]
+}

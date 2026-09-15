@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "module": "variant_qc",
+  "created_at": "2026-09-12T06:49:33.847448+00:00",
+  "sample_id": "SYNTHETIC_NORMALIZATION_TEST",
+  "profile": "smoke",
+  "pipeline_version": "regression-test",
+  "input": {
+    "vcf": "/home/efe/projects/modular-human-genomics-pipeline/tests/fixtures/variant_normalization/observed.normalized.vcf.gz"
+  },
+  "overall_status": "PASS",
+  "technical_scope": "Germline SNV/small-indel VCF QC. Not clinical interpretation.",
+  "metrics": {
+    "records": 5,
+    "variant_alleles": 5,
+    "multi_allelic_records": 0,
+    "variant_types": {
+      "SNP": 3,
+      "INDEL": 2
+    },
+    "filters": {
+      "PASS": 5
+    },
+    "pass_records": 5,
+    "pass_rate": 1.0,
+    "genotypes": {
+      "HET": 4,
+      "HOM_ALT": 1
+    },
+    "het_hom_alt_ratio": 4.0,
+    "transitions": 2,
+    "transversions": 1,
+    "ti_tv": 2.0,
+    "quality": {
+      "qual": {
+        "n": 5,
+        "mean": 78.0,
+        "median": 80.0,
+        "p10": 64.0,
+        "p90": 90.0
+      },
+      "depth": {
+        "n": 5,
+        "mean": 43.0,
+        "median": 42,
+        "p10": 36.2,
+        "p90": 50.0
+      },
+      "genotype_quality": {
+        "n": 5,
+        "mean": 96.4,
+        "median": 99.0,
+        "p10": 92.0,
+        "p90": 99.0
+      }
+    },
+    "records_by_chromosome": {
+      "chr20": 5
+    }
+  },
+  "warnings": [],
+  "failures": [],
+  "threshold_note": "wgs35x thresholds are development heuristics and are not clinically validated."
+}

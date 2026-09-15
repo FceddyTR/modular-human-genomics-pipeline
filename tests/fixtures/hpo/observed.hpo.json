@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "importer": {
+    "name": "hpo_importer",
+    "version": "0.1.0"
+  },
+  "source": {
+    "name": "Human Phenotype Ontology",
+    "file": "genes_to_phenotype.txt"
+  },
+  "summary": {
+    "record_count": 3,
+    "unique_genes": 2,
+    "unique_phenotypes": 3,
+    "unique_diseases": 3,
+    "disease_prefixes": {
+      "OMIM": 2,
+      "ORPHA": 1
+    }
+  },
+  "records": [
+    {
+      "schema_version": "1.1",
+      "source": "HPO",
+      "evidence_type": "gene_phenotype",
+      "gene_symbol": "TESTGENE",
+      "gene_id": "NCBIGene:11111",
+      "disease_id": "OMIM:999001",
+      "disease_name": null,
+      "phenotype_ids": [
+        "HP:0000001"
+      ],
+      "inheritance": [],
+      "classification": null,
+      "confidence": null,
+      "frequency": "2/3",
+      "source_record_id": "NCBIGene:11111|OMIM:999001|HP:0000001",
+      "source_version": null,
+      "source_release": null,
+      "citations": [],
+      "evidence_description": "HP:0000001 Synthetic phenotype one; frequency=2/3",
+      "license": null
+    },
+    {
+      "schema_version": "1.1",
+      "source": "HPO",
+      "evidence_type": "gene_phenotype",
+      "gene_symbol": "TESTGENE",
+      "gene_id": "NCBIGene:11111",
+      "disease_id": "ORPHA:999002",
+      "disease_name": null,
+      "phenotype_ids": [
+        "HP:0000002"
+      ],
+      "inheritance": [],
+      "classification": null,
+      "confidence": null,
+      "frequency": "HP:0040283",
+      "source_record_id": "NCBIGene:11111|ORPHA:999002|HP:0000002",
+      "source_version": null,
+      "source_release": null,
+      "citations": [],
+      "evidence_description": "HP:0000002 Synthetic phenotype two; frequency=HP:0040283",
+      "license": null
+    },
+    {
+      "schema_version": "1.1",
+      "source": "HPO",
+      "evidence_type": "gene_phenotype",
+      "gene_symbol": "OTHERGENE",
+      "gene_id": "NCBIGene:22222",
+      "disease_id": "OMIM:999003",
+      "disease_name": null,
+      "phenotype_ids": [
+        "HP:0000003"
+      ],
+      "inheritance": [],
+      "classification": null,
+      "confidence": null,
+      "frequency": "-",
+      "source_record_id": "NCBIGene:22222|OMIM:999003|HP:0000003",
+      "source_version": null,
+      "source_release": null,
+      "citations": [],
+      "evidence_description": "HP:0000003 Synthetic phenotype three",
+      "license": null
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+schema_version: "1.0"
+
+sources:
+
+  gencc:
+    enabled: true
+    evidence_type: gene_disease_validity
+    update_strategy: release_snapshot
+    license: CC0-1.0
+    notes:
+      - Use new SGC-ID/version-number download format.
+      - Do not depend on deprecated legacy UUID format.
+      - OMIM-derived restricted data are not included in GenCC downloads.
+
+  panelapp:
+    enabled: true
+    evidence_type: expert_gene_panel
+    update_strategy: api_snapshot
+    notes:
+      - Preserve panel ID and panel version.
+      - Preserve confidence level and mode of inheritance.
+      - Prefer entities API over legacy genes endpoint.
+
+  orphanet:
+    enabled: true
+    evidence_type:
+      - gene_disease
+      - disease_phenotype
+    update_strategy: release_snapshot
+    license: CC-BY-4.0
+    notes:
+      - Preserve ORPHA identifiers.
+      - Preserve release date.
+
+  hpo:
+    enabled: true
+    evidence_type:
+      - gene_phenotype
+      - disease_phenotype
+    update_strategy: release_snapshot
+    notes:
+      - Preserve HPO IDs.
+      - Retain disease ID and frequency where available.
+
+  mondo:
+    enabled: true
+    evidence_type: disease_normalization
+    update_strategy: release_snapshot
+    license: CC-BY-4.0
+    notes:
+      - Use stable release.
+      - Preserve source cross-references.

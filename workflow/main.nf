@@ -6,6 +6,7 @@ include { RAW_QC }       from './modules/raw_qc'
 include { QC_GATE }      from './modules/qc_gate'
 include { ALIGNMENT }    from './modules/alignment'
 include { ALIGNMENT_QC } from './modules/alignment_qc'
+include { DEEPVARIANT }  from './modules/deepvariant'
 
 
 workflow {
@@ -129,6 +130,14 @@ workflow {
     )
 
 
+    reference_fai_ch = Channel.value(
+        file(
+            "${params.reference}.fai",
+            checkIfExists: true
+        )
+    )
+
+
     bwa_index_ch = Channel.value(
         [
             file(
@@ -181,7 +190,7 @@ workflow {
 
     /*
      * ---------------------------------------------------------
-     * Alignment input only becomes available after QC gate.
+     * Alignment input only becomes available after raw QC gate.
      * ---------------------------------------------------------
      */
 
@@ -226,5 +235,41 @@ workflow {
         ALIGNMENT.out.bam,
         alignment_qc_thresholds_ch,
         alignment_qc_script_ch
+    )
+
+
+    /*
+     * ---------------------------------------------------------
+     * Germline small-variant calling
+     *
+     * DeepVariant waits until alignment QC has completed.
+     * A dedicated hard QC gate will be generalized later.
+     * ---------------------------------------------------------
+     */
+
+    variant_calling_ready_ch =
+        ALIGNMENT.out.bam
+            .join(
+                ALIGNMENT_QC.out.json
+            )
+            .map {
+                sample_id,
+                bam,
+                bai,
+                alignment_qc_json
+                ->
+
+                tuple(
+                    sample_id,
+                    bam,
+                    bai
+                )
+            }
+
+
+    DEEPVARIANT(
+        variant_calling_ready_ch,
+        reference_fasta_ch,
+        reference_fai_ch
     )
 }
