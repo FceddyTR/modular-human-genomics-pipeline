@@ -151,10 +151,35 @@ def query_variant(
         )
 
     if result.get("errors"):
-        messages = "; ".join(
+        messages = [
             str(item.get("message", item))
             for item in result["errors"]
-        )
+        ]
+
+        normalized_messages = [
+            message.strip().lower()
+            for message in messages
+        ]
+
+        # gnomAD Browser GraphQL may represent a genuine absent
+        # variant as a GraphQL error instead of data.variant=null.
+        #
+        # Only the explicit "Variant not found" condition is mapped
+        # to NOT_FOUND. Transport, schema, overload, resolver, and
+        # other GraphQL failures must remain ERROR.
+        if (
+            len(normalized_messages) == 1
+            and normalized_messages[0] == "variant not found"
+        ):
+            return GnomADRecord(
+                assembly=assembly,
+                chrom=chrom,
+                pos=pos,
+                ref=ref,
+                alt=alt,
+                lookup_status="NOT_FOUND",
+                source_dataset=dataset_id,
+            )
 
         return GnomADRecord(
             assembly=assembly,
@@ -164,7 +189,7 @@ def query_variant(
             alt=alt,
             lookup_status="ERROR",
             source_dataset=dataset_id,
-            error=f"GraphQL: {messages}",
+            error=f"GraphQL: {'; '.join(messages)}",
         )
 
     variant = result.get("data", {}).get("variant")
