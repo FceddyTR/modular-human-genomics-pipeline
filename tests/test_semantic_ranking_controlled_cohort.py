@@ -589,3 +589,181 @@ def test_semantic_truth_not_exposed(
         ]
         is False
     )
+
+
+def test_semantic_rank_recovery_when_variant_evidence_is_balanced(
+    semantic,
+):
+    """Semantic phenotype can recover causal rank.
+
+    This controlled case differs from the information-recovery
+    benchmark above.
+
+    The decoy has a modest variant-evidence advantage:
+    VUS + frameshift + very low AF.
+
+    The causal candidate has:
+    VUS + missense + very low AF,
+    but a substantially stronger ontology relationship to the
+    patient's phenotype.
+
+    Truth is introduced only after both rankings are complete.
+    """
+
+    decoy = make_candidate(
+        candidate_id="rank-recovery-decoy",
+        gene="DECOY_RECOVERY",
+        position=67101,
+        consequence="frameshift_variant",
+        impact="HIGH",
+        significance="Uncertain_significance",
+        af=1e-6,
+        associated_hpo=(
+            DECOY_ASSOCIATED_HPO
+        ),
+    )
+
+    causal = make_candidate(
+        candidate_id="rank-recovery-causal",
+        gene="CAUSAL_RECOVERY",
+        position=67102,
+        consequence="missense_variant",
+        impact="MODERATE",
+        significance="Uncertain_significance",
+        af=1e-5,
+        associated_hpo=(
+            CAUSAL_ASSOCIATED_HPO
+        ),
+    )
+
+    cohort = (
+        decoy,
+        causal,
+    )
+
+    exact = rank_candidates(
+        cohort,
+        mode=RankingMode.PHENOTYPE,
+    )
+
+    semantic_result = rank_candidates(
+        cohort,
+        mode=(
+            RankingMode.PHENOTYPE_SEMANTIC
+        ),
+        semantic_engine=semantic,
+    )
+
+    # Truth remains outside the ranking engine
+    # and is constructed only after ranking.
+    truth = RankingTruth(
+        case_id=(
+            "semantic-rank-recovery-001"
+        ),
+        causal_candidate_ids=(
+            "rank-recovery-causal",
+        ),
+    )
+
+    exact_metrics = evaluate_ranking(
+        exact,
+        truth,
+        k_values=(1, 2),
+    )
+
+    semantic_metrics = evaluate_ranking(
+        semantic_result,
+        truth,
+        k_values=(1, 2),
+    )
+
+    exact_by_id = {
+        candidate.candidate_id: candidate
+        for candidate in exact.candidates
+    }
+
+    semantic_by_id = {
+        candidate.candidate_id: candidate
+        for candidate
+        in semantic_result.candidates
+    }
+
+    exact_causal_phenotype = component(
+        exact_by_id[
+            "rank-recovery-causal"
+        ],
+        "phenotype",
+    )
+
+    semantic_causal_phenotype = component(
+        semantic_by_id[
+            "rank-recovery-causal"
+        ],
+        "phenotype",
+    )
+
+    semantic_decoy_phenotype = component(
+        semantic_by_id[
+            "rank-recovery-decoy"
+        ],
+        "phenotype",
+    )
+
+    # Exact matching cannot use the ontology-near term.
+    assert (
+        exact_causal_phenotype.contribution
+        == 0.0
+    )
+
+    # Semantic similarity recovers phenotype information.
+    assert (
+        semantic_causal_phenotype.contribution
+        > semantic_decoy_phenotype.contribution
+    )
+
+    # Observed controlled rank recovery:
+    # exact #2 -> semantic #1.
+    assert (
+        exact_metrics.best_causal_rank
+        == 2
+    )
+
+    assert (
+        semantic_metrics.best_causal_rank
+        == 1
+    )
+
+    assert (
+        semantic_metrics.reciprocal_rank
+        > exact_metrics.reciprocal_rank
+    )
+
+    assert (
+        exact_metrics.hit_at_k[1]
+        is False
+    )
+
+    assert (
+        semantic_metrics.hit_at_k[1]
+        is True
+    )
+
+    # The benchmark truth must never become
+    # part of ranking output semantics.
+    data = semantic_result.to_dict()
+
+    assert "truth" not in data
+
+    assert (
+        data["semantic_boundaries"][
+            "pathogenicity_probability"
+        ]
+        is False
+    )
+
+    assert (
+        data["semantic_boundaries"][
+            "diagnosis"
+        ]
+        is False
+    )
