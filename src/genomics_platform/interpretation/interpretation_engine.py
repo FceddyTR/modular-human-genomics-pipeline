@@ -30,6 +30,9 @@ from genomics_platform.interpretation.functional_interpreter import (
 from genomics_platform.interpretation.gene_disease_interpreter import (
     interpret_gene_disease,
 )
+from genomics_platform.interpretation.inheritance_interpreter import (
+    interpret_inheritance,
+)
 from genomics_platform.interpretation.interpretation_profile import (
     InterpretationProfile,
 )
@@ -41,7 +44,7 @@ from genomics_platform.interpretation.population_interpreter import (
 )
 
 
-ENGINE_VERSION = "0.3.0"
+ENGINE_VERSION = "0.4.0"
 
 
 def interpret_variant(
@@ -55,6 +58,9 @@ def interpret_variant(
     absent_hpo_terms: Optional[
         Iterable[str]
     ] = None,
+    genotype_state: Optional[str] = None,
+    proband_sex: Optional[str] = None,
+    de_novo_status: Optional[bool] = None,
 ) -> InterpretationProfile:
     """Build a descriptive Interpretation Profile.
 
@@ -133,12 +139,30 @@ def interpret_variant(
             absent_hpo_terms=absent_hpo_terms,
         )
 
+    inheritance = None
+
+    inheritance_requested = (
+        genotype_state is not None
+        or proband_sex is not None
+        or de_novo_status is not None
+    )
+
+    if inheritance_requested:
+        inheritance = interpret_inheritance(
+            gene_evidence_bundle=(
+                gene_evidence_context
+            ),
+            genotype_state=genotype_state,
+            proband_sex=proband_sex,
+            de_novo_status=de_novo_status,
+        )
+
     return InterpretationProfile(
         variant_key=contract.identity.variant_key,
         population=population,
         clinical=clinical,
         functional=functional,
         phenotype=phenotype,
-        inheritance=None,
+        inheritance=inheritance,
         gene_disease=gene_disease,
     )
