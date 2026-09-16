@@ -36,17 +36,25 @@ def semantic():
     )
 
 
-def test_initial_registry_contains_12_cases():
+def test_initial_registry_contains_44_cases():
     registry = build_initial_registry()
 
     assert len(
         registry.case_ids()
-    ) == 12
+    ) == 44
 
     assert registry.family_counts() == {
         "functional": 4,
+        "gene_disease": 4,
+        "gene_mismatch": 4,
+        "inheritance": 4,
+        "missingness": 4,
+        "conflict": 4,
+        "borda_ties": 4,
+        "negative_phenotype": 4,
         "phenotype": 4,
         "population": 4,
+        "semantic_challenge": 4,
     }
 
 
@@ -187,3 +195,210 @@ def test_truth_ids_are_resolved_only_from_case():
     assert set(
         case.causal_candidate_ids()
     ) <= ranked_ids
+
+
+def test_factory_supports_gene_disease_context():
+    from genomics_platform.ranking.benchmark.synthetic_factory import (
+        make_gene_context,
+    )
+
+    context = make_gene_context(
+        gene="TESTGENE",
+        gencc_classification="Definitive",
+        panelapp_confidence="Green",
+    )
+
+    candidate = make_synthetic_candidate(
+        candidate_id="gene-disease-check",
+        gene="TESTGENE",
+        position=80001,
+        gene_context=context,
+    )
+
+    assert candidate.interpretation_profile.gene_disease is not None
+    assert (
+        candidate.interpretation_profile.gene_disease.status
+        == "AVAILABLE"
+    )
+
+
+def test_factory_supports_inheritance_context():
+    from genomics_platform.ranking.benchmark.synthetic_factory import (
+        make_gene_context,
+    )
+
+    context = make_gene_context(
+        gene="TESTGENE",
+        inheritance=("Autosomal dominant",),
+    )
+
+    candidate = make_synthetic_candidate(
+        candidate_id="inheritance-check",
+        gene="TESTGENE",
+        position=80002,
+        gene_context=context,
+        genotype_state="heterozygous",
+    )
+
+    assert candidate.interpretation_profile.inheritance is not None
+    assert (
+        candidate.interpretation_profile.inheritance.status
+        == "AVAILABLE"
+    )
+
+
+def test_factory_can_construct_real_gene_mismatch():
+    candidate = make_synthetic_candidate(
+        candidate_id="mismatch-check",
+        gene="CONTRACTGENE",
+        case_gene="OTHERGENE",
+        position=80003,
+        allow_gene_mismatch=True,
+    )
+
+    assert candidate.gene_consistency == "MISMATCH"
+
+
+def _component_by_name(
+    ranked_candidate,
+    name,
+):
+    return next(
+        component
+        for component in ranked_candidate.components
+        if component.name == name
+    )
+
+
+def test_gene_mismatch_blocks_gene_disease_ranking_signal():
+    registry = build_initial_registry()
+
+    case = registry.build(
+        "gene-mismatch-disease-block-001"
+    )
+
+    result = rank_candidates(
+        case.ranking_candidates(),
+        mode=RankingMode.VARIANT_FIRST,
+    )
+
+    causal = next(
+        candidate
+        for candidate in result.candidates
+        if candidate.candidate_id == "causal"
+    )
+
+    component = _component_by_name(
+        causal,
+        "gene_disease",
+    )
+
+    assert component.status == "BLOCKED"
+    assert component.contribution == 0.0
+
+
+def test_gene_mismatch_blocks_inheritance_ranking_signal():
+    registry = build_initial_registry()
+
+    case = registry.build(
+        "gene-mismatch-inheritance-block-001"
+    )
+
+    result = rank_candidates(
+        case.ranking_candidates(),
+        mode=RankingMode.VARIANT_FIRST,
+    )
+
+    causal = next(
+        candidate
+        for candidate in result.candidates
+        if candidate.candidate_id == "causal"
+    )
+
+    component = _component_by_name(
+        causal,
+        "inheritance",
+    )
+
+    assert component.status == "BLOCKED"
+    assert component.contribution == 0.0
+
+
+def test_gene_mismatch_does_not_block_independent_variant_signals():
+    registry = build_initial_registry()
+
+    case = registry.build(
+        "gene-mismatch-variant-survives-001"
+    )
+
+    result = rank_candidates(
+        case.ranking_candidates(),
+        mode=RankingMode.VARIANT_FIRST,
+    )
+
+    causal = next(
+        candidate
+        for candidate in result.candidates
+        if candidate.candidate_id == "causal"
+    )
+
+    for name in (
+        "clinical",
+        "population",
+        "functional",
+    ):
+        component = _component_by_name(
+            causal,
+            name,
+        )
+
+        assert component.status != "BLOCKED"
+
+
+def test_matched_control_keeps_gene_dependent_signals_eligible():
+    registry = build_initial_registry()
+
+    case = registry.build(
+        "gene-mismatch-matched-control-001"
+    )
+
+    result = rank_candidates(
+        case.ranking_candidates(),
+        mode=RankingMode.VARIANT_FIRST,
+    )
+
+    causal = next(
+        candidate
+        for candidate in result.candidates
+        if candidate.candidate_id == "causal"
+    )
+
+    assert (
+        _component_by_name(
+            causal,
+            "gene_disease",
+        ).status
+        != "BLOCKED"
+    )
+
+    assert (
+        _component_by_name(
+            causal,
+            "inheritance",
+        ).status
+        != "BLOCKED"
+    )
+
+
+def test_initial_registry_contains_semantic_challenge_cases():
+    registry = build_initial_registry()
+    case_ids = set(registry.case_ids())
+
+    expected = {
+        "semantic-near-vs-distant-001",
+        "semantic-rank-recovery-001",
+        "semantic-information-recovery-001",
+        "semantic-exact-control-001",
+    }
+
+    assert expected <= case_ids

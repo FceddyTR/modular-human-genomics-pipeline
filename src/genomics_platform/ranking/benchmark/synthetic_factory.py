@@ -51,6 +51,7 @@ def make_synthetic_contract(
     ref: str = "AG",
     alt: str = "A",
     assembly: str = "GRCh38",
+    population_status: str | None = None,
 ) -> VariantEvidenceContract:
     """Construct one synthetic production evidence contract."""
 
@@ -114,7 +115,11 @@ def make_synthetic_contract(
 
     if af is None:
         exome = None
-        gnomad_status = "NOT_FOUND"
+        gnomad_status = (
+            population_status
+            if population_status is not None
+            else "NOT_FOUND"
+        )
     else:
         exome = PopulationDatasetEvidence(
             ac=1,
@@ -123,7 +128,11 @@ def make_synthetic_contract(
             homozygote_count=0,
             populations=(),
         )
-        gnomad_status = "FOUND"
+        gnomad_status = (
+            population_status
+            if population_status is not None
+            else "FOUND"
+        )
 
     population = PopulationEvidence(
         exome=exome,
@@ -164,6 +173,7 @@ def make_phenotype_dimension(
     associated_hpo: str,
     exact_match: bool = False,
     gene: str | None = None,
+    absent_hpo_terms: tuple[str, ...] = (),
 ) -> EvidenceDimension:
     """Construct controlled phenotype observations."""
 
@@ -203,7 +213,9 @@ def make_phenotype_dimension(
                         unmatched_present
                     ),
                     "matched_absent": [],
-                    "unmatched_absent": [],
+                    "unmatched_absent": list(
+                        absent_hpo_terms
+                    ),
                 },
                 source="controlled_fixture",
             ),
@@ -227,7 +239,11 @@ def make_phenotype_dimension(
                     "present_exact_matches": (
                         matched_present
                     ),
-                    "absent_exact_matches": [],
+                    "absent_exact_matches": [
+                        term
+                        for term in absent_hpo_terms
+                        if term == associated_hpo
+                    ],
                 },
                 source="HPO",
             ),
@@ -239,6 +255,71 @@ def make_phenotype_dimension(
     )
 
 
+def make_gene_context(
+    *,
+    gene: str,
+    gencc_classification: str | None = "Definitive",
+    panelapp_confidence: str | None = "Green",
+    inheritance: tuple[str, ...] = (),
+) -> dict:
+    """Construct controlled gene-level evidence context."""
+
+    records = []
+
+    if gencc_classification is not None:
+        evidence = {
+            "source": "GenCC",
+            "gene_symbol": gene,
+            "disease_id": "MONDO:0000001",
+            "disease_label": "Synthetic disease",
+            "classification": gencc_classification,
+        }
+
+        if inheritance:
+            evidence["inheritance"] = list(inheritance)
+
+        records.append(
+            {
+                "evidence": evidence,
+                "disease_normalization": {
+                    "status": "FOUND",
+                    "mondo_id": "MONDO:0000001",
+                    "mondo_label": "Synthetic disease",
+                },
+            }
+        )
+
+    if panelapp_confidence is not None:
+        evidence = {
+            "source": "PanelApp",
+            "gene_symbol": gene,
+            "disease_id": "MONDO:0000001",
+            "disease_label": "Synthetic disease",
+            "confidence_level": panelapp_confidence,
+        }
+
+        if inheritance:
+            evidence["inheritance"] = list(inheritance)
+
+        records.append(
+            {
+                "evidence": evidence,
+                "disease_normalization": {
+                    "status": "FOUND",
+                    "mondo_id": "MONDO:0000001",
+                    "mondo_label": "Synthetic disease",
+                },
+            }
+        )
+
+    return {
+        "query": {
+            "gene_symbol": gene,
+        },
+        "records": records,
+    }
+
+
 def make_synthetic_candidate(
     *,
     candidate_id: str,
@@ -248,9 +329,17 @@ def make_synthetic_candidate(
     impact: str = "MODERATE",
     significance: str = "Uncertain_significance",
     af: float | None = 0.00001,
+    population_status: str | None = None,
     patient_hpo: str | None = None,
     associated_hpo: str | None = None,
     exact_phenotype_match: bool = False,
+    gene_context: dict | None = None,
+    genotype_state: str | None = None,
+    proband_sex: str | None = None,
+    de_novo_status: str | None = None,
+    absent_hpo_terms: tuple[str, ...] = (),
+    case_gene: str | None = None,
+    allow_gene_mismatch: bool = False,
 ):
     """Build a synthetic CandidateCase without benchmark truth."""
 
@@ -261,10 +350,16 @@ def make_synthetic_candidate(
         impact=impact,
         significance=significance,
         af=af,
+        population_status=population_status,
     )
 
     profile = interpret_variant(
-        contract
+        contract,
+        gene_evidence_context=gene_context,
+        genotype_state=genotype_state,
+        proband_sex=proband_sex,
+        de_novo_status=de_novo_status,
+        absent_hpo_terms=absent_hpo_terms,
     )
 
     present_hpo_terms: tuple[str, ...] = ()
@@ -278,28 +373,30 @@ def make_synthetic_candidate(
             phenotype=make_phenotype_dimension(
                 patient_hpo=patient_hpo,
                 associated_hpo=associated_hpo,
-                exact_match=(
-                    exact_phenotype_match
-                ),
+                exact_match=exact_phenotype_match,
                 gene=gene,
+                absent_hpo_terms=absent_hpo_terms,
             ),
         )
 
-        present_hpo_terms = (
-            patient_hpo,
-        )
+        present_hpo_terms = (patient_hpo,)
 
     candidate = build_candidate_case(
         candidate_id=candidate_id,
         evidence_contract=contract,
         interpretation_profile=profile,
-        gene_symbol=gene,
-        present_hpo_terms=(
-            present_hpo_terms
+        gene_symbol=(
+            case_gene
+            if case_gene is not None
+            else gene
         ),
+        present_hpo_terms=present_hpo_terms,
     )
 
-    if candidate.gene_consistency != "MATCH":
+    if (
+        not allow_gene_mismatch
+        and candidate.gene_consistency != "MATCH"
+    ):
         raise ValueError(
             "Synthetic candidate unexpectedly "
             "failed gene consistency."

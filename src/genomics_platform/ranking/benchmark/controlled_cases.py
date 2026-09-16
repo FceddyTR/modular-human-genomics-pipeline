@@ -446,9 +446,34 @@ def functional_variant_pressure():
 
 
 def build_initial_registry():
+    from genomics_platform.ranking.benchmark.controlled_families.gene_disease import (
+        BUILDERS as GENE_DISEASE_BUILDERS,
+    )
+    from genomics_platform.ranking.benchmark.controlled_families.inheritance import (
+        BUILDERS as INHERITANCE_BUILDERS,
+    )
+    from genomics_platform.ranking.benchmark.controlled_families.gene_mismatch import (
+        BUILDERS as GENE_MISMATCH_BUILDERS,
+    )
+    from genomics_platform.ranking.benchmark.controlled_families.missingness import (
+        BUILDERS as MISSINGNESS_BUILDERS,
+    )
+    from genomics_platform.ranking.benchmark.controlled_families.conflict import (
+        BUILDERS as CONFLICT_BUILDERS,
+    )
+    from genomics_platform.ranking.benchmark.controlled_families.borda_ties import (
+        BUILDERS as BORDA_TIE_BUILDERS,
+    )
+    from genomics_platform.ranking.benchmark.controlled_families.negative_phenotype import (
+        BUILDERS as NEGATIVE_PHENOTYPE_BUILDERS,
+    )
+    from genomics_platform.ranking.benchmark.controlled_families.semantic_challenge import (
+        BUILDERS as SEMANTIC_CHALLENGE_BUILDERS,
+    )
+
     registry = ControlledSuiteRegistry()
 
-    builders = (
+    baseline_builders = (
         phenotype_semantic_near,
         phenotype_exact_causal,
         phenotype_variant_pressure,
@@ -461,6 +486,18 @@ def build_initial_registry():
         functional_missense_causal,
         functional_balanced,
         functional_variant_pressure,
+    )
+
+    builders = (
+        baseline_builders
+        + GENE_DISEASE_BUILDERS
+        + INHERITANCE_BUILDERS
+        + GENE_MISMATCH_BUILDERS
+        + MISSINGNESS_BUILDERS
+        + CONFLICT_BUILDERS
+        + BORDA_TIE_BUILDERS
+        + NEGATIVE_PHENOTYPE_BUILDERS
+        + SEMANTIC_CHALLENGE_BUILDERS
     )
 
     for builder in builders:

@@ -18,6 +18,9 @@ from typing import Any, Iterable
 from genomics_platform.ranking.borda import (
     BordaResult,
 )
+from genomics_platform.ranking.rank_aggregation import (
+    RankAggregationResult,
+)
 from genomics_platform.ranking.ranking_contract import (
     RankingResult,
 )
@@ -26,6 +29,9 @@ from genomics_platform.ranking.benchmark.borda_metrics import (
 )
 from genomics_platform.ranking.benchmark.metrics import (
     evaluate_ranking,
+)
+from genomics_platform.ranking.benchmark.rank_aggregation_metrics import (
+    evaluate_rank_aggregation,
 )
 from genomics_platform.ranking.benchmark.truth_set import (
     RankingTruth,
@@ -46,7 +52,7 @@ class BenchmarkRun:
     """One completed ranking strategy for one benchmark case."""
 
     strategy: str
-    result: RankingResult | BordaResult
+    result: RankingResult | BordaResult | RankAggregationResult
 
     def __post_init__(self) -> None:
         strategy = self.strategy.strip()
@@ -89,7 +95,7 @@ class BenchmarkCase:
 
 
 def _phenotype_mode(
-    result: RankingResult | BordaResult,
+    result: RankingResult | BordaResult | RankAggregationResult,
 ) -> str:
     if isinstance(result, RankingResult):
         return result.mode.value
@@ -98,21 +104,37 @@ def _phenotype_mode(
 
 
 def _aggregation(
-    result: RankingResult | BordaResult,
+    result: RankingResult | BordaResult | RankAggregationResult,
 ) -> str:
     if isinstance(result, RankingResult):
         return "weighted_additive"
 
-    return "borda"
+    if isinstance(result, BordaResult):
+        return "borda"
+
+    if isinstance(result, RankAggregationResult):
+        return f"rank_{result.method.value}"
+
+    raise TypeError(
+        f"Unsupported ranking result type: {type(result)!r}"
+    )
 
 
 def _score_type(
-    result: RankingResult | BordaResult,
+    result: RankingResult | BordaResult | RankAggregationResult,
 ) -> str:
     if isinstance(result, RankingResult):
         return "prioritization_score"
 
-    return "borda_score"
+    if isinstance(result, BordaResult):
+        return "borda_score"
+
+    if isinstance(result, RankAggregationResult):
+        return "aggregate_rank_score"
+
+    raise TypeError(
+        f"Unsupported ranking result type: {type(result)!r}"
+    )
 
 
 def _metric_row(
@@ -164,11 +186,22 @@ def _metric_row(
 
         return row
 
-    metrics = evaluate_borda_ranking(
-        result,
-        truth,
-        k_values=k_values,
-    )
+    if isinstance(result, BordaResult):
+        metrics = evaluate_borda_ranking(
+            result,
+            truth,
+            k_values=k_values,
+        )
+    elif isinstance(result, RankAggregationResult):
+        metrics = evaluate_rank_aggregation(
+            result,
+            truth,
+            k_values=k_values,
+        )
+    else:
+        raise TypeError(
+            f"Unsupported ranking result type: {type(result)!r}"
+        )
 
     row["best_causal_rank"] = (
         metrics.best_causal_rank
@@ -275,7 +308,10 @@ def build_candidate_rows(
                     participated = None
                     available = None
                     coverage = None
-                else:
+                elif isinstance(
+                    result,
+                    BordaResult,
+                ):
                     score = candidate.borda_score
                     participated = (
                         candidate.ballots_participated
@@ -287,6 +323,27 @@ def build_candidate_rows(
                         participated / available
                         if available
                         else 0.0
+                    )
+                elif isinstance(
+                    result,
+                    RankAggregationResult,
+                ):
+                    score = (
+                        candidate.aggregate_rank_score
+                    )
+                    participated = (
+                        candidate.components_participated
+                    )
+                    available = (
+                        candidate.components_available
+                    )
+                    coverage = (
+                        candidate.evidence_coverage
+                    )
+                else:
+                    raise TypeError(
+                        "Unsupported ranking result type: "
+                        f"{type(result)!r}"
                     )
 
                 rows.append(

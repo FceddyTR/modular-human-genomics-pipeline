@@ -28,6 +28,10 @@ from genomics_platform.ranking.benchmark.truth_set import (
 from genomics_platform.ranking.borda import (
     aggregate_borda,
 )
+from genomics_platform.ranking.rank_aggregation import (
+    RankAggregationMethod,
+    aggregate_component_ranks,
+)
 from genomics_platform.ranking.ranking_engine import (
     rank_candidates,
 )
@@ -91,6 +95,11 @@ def build_benchmark_case(
         weighted_semantic
     )
 
+    rank_geomean_semantic = aggregate_component_ranks(
+        weighted_semantic,
+        method=RankAggregationMethod.GEOMETRIC_MEAN,
+    )
+
     # IMPORTANT:
     # Truth is created only after every ranking result
     # above has been frozen.
@@ -119,6 +128,10 @@ def build_benchmark_case(
             BenchmarkRun(
                 strategy="borda_semantic",
                 result=borda_semantic,
+            ),
+            BenchmarkRun(
+                strategy="rank_geomean_semantic",
+                result=rank_geomean_semantic,
             ),
         ),
     )
@@ -183,27 +196,48 @@ def print_diagnostic_table(
         "weighted_exact",
         "weighted_semantic",
         "borda_semantic",
+        "rank_geomean_semantic",
     )
+
+    case_width = max(
+        len("case_id"),
+        *(
+            len(case.truth.case_id)
+            for case in benchmark_cases
+        ),
+    ) + 2
+
+    family_width = max(
+        len("family"),
+        *(
+            len(case.family)
+            for case in controlled_cases
+        ),
+    ) + 2
+
+    header = (
+        f"{'case_id':<{case_width}}"
+        f"{'family':<{family_width}}"
+        f"{'VF':>7}"
+        f"{'Exact':>8}"
+        f"{'Semantic':>10}"
+        f"{'Borda-S':>10}"
+        f"{'GeoRank':>10}"
+    )
+
+    separator_width = len(header)
 
     print()
     print(
         "CONTROLLED SUITE DIAGNOSTIC"
     )
     print(
-        "=" * 100
+        "=" * separator_width
     )
-
-    header = (
-        f"{'case_id':38}"
-        f"{'family':12}"
-        f"{'VF':>7}"
-        f"{'Exact':>8}"
-        f"{'Semantic':>10}"
-        f"{'Borda-S':>10}"
-    )
-
     print(header)
-    print("-" * 100)
+    print(
+        "-" * separator_width
+    )
 
     for case in benchmark_cases:
         causal_ids = set(
@@ -228,15 +262,18 @@ def print_diagnostic_table(
             )
 
         print(
-            f"{case.truth.case_id:38}"
-            f"{family_by_case[case.truth.case_id]:12}"
+            f"{case.truth.case_id:<{case_width}}"
+            f"{family_by_case[case.truth.case_id]:<{family_width}}"
             f"{str(ranks[strategies[0]]):>7}"
             f"{str(ranks[strategies[1]]):>8}"
             f"{str(ranks[strategies[2]]):>10}"
             f"{str(ranks[strategies[3]]):>10}"
+            f"{str(ranks[strategies[4]]):>10}"
         )
 
-    print("=" * 100)
+    print(
+        "=" * separator_width
+    )
 
 
 def main():
