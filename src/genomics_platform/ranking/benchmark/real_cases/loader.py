@@ -11,6 +11,7 @@ from .contract import (
 )
 from .manifest import load_case_manifest
 from .replay import replay_candidate_case
+from .snapshot import SNAPSHOT_SCHEMA_VERSION
 from .validation import validate_real_case_input
 
 
@@ -93,6 +94,115 @@ def _load_provenance(
     )
 
 
+def _load_snapshot_candidate(
+    payload: Any,
+):
+    wrapper = _mapping(
+        payload,
+        field_name="candidate_snapshot",
+    )
+
+    metadata = _mapping(
+        wrapper.get("snapshot_metadata"),
+        field_name=(
+            "candidate_snapshot."
+            "snapshot_metadata"
+        ),
+    )
+
+    if (
+        metadata.get(
+            "snapshot_schema_version"
+        )
+        != SNAPSHOT_SCHEMA_VERSION
+    ):
+        raise ValueError(
+            "Unsupported candidate snapshot "
+            "schema version."
+        )
+
+    snapshot_date = metadata.get(
+        "snapshot_date"
+    )
+    pipeline_version = metadata.get(
+        "pipeline_version"
+    )
+    source_versions = metadata.get(
+        "source_versions"
+    )
+
+    if not isinstance(
+        snapshot_date,
+        str,
+    ) or not snapshot_date.strip():
+        raise ValueError(
+            "Candidate snapshot requires "
+            "snapshot_date."
+        )
+
+    if not isinstance(
+        pipeline_version,
+        str,
+    ) or not pipeline_version.strip():
+        raise ValueError(
+            "Candidate snapshot requires "
+            "pipeline_version."
+        )
+
+    if not isinstance(
+        source_versions,
+        dict,
+    ):
+        raise ValueError(
+            "Candidate snapshot requires "
+            "source_versions object."
+        )
+
+    candidate_payload = _mapping(
+        wrapper.get("candidate"),
+        field_name=(
+            "candidate_snapshot.candidate"
+        ),
+    )
+
+    boundaries = _mapping(
+        wrapper.get(
+            "semantic_boundaries",
+            {},
+        ),
+        field_name=(
+            "candidate_snapshot."
+            "semantic_boundaries"
+        ),
+    )
+
+    if (
+        boundaries.get(
+            "benchmark_truth_present"
+        )
+        is not False
+    ):
+        raise ValueError(
+            "Candidate snapshot must declare "
+            "benchmark_truth_present=false."
+        )
+
+    if (
+        boundaries.get(
+            "truth_used_for_ranking"
+        )
+        is not False
+    ):
+        raise ValueError(
+            "Candidate snapshot must declare "
+            "truth_used_for_ranking=false."
+        )
+
+    return replay_candidate_case(
+        candidate_payload
+    )
+
+
 def load_real_case_input(
     path: str | Path,
 ) -> RealCaseInput:
@@ -117,12 +227,7 @@ def load_real_case_input(
     )
 
     candidates = tuple(
-        replay_candidate_case(
-            _mapping(
-                item,
-                field_name="candidate",
-            )
-        )
+        _load_snapshot_candidate(item)
         for item in candidate_payloads
     )
 
@@ -174,12 +279,13 @@ def load_real_case_input(
         ):
             raise ValueError(
                 "Candidate assembly does not match "
-                f"case assembly: "
+                "case assembly: "
                 f"{candidate.candidate_id!r}"
             )
 
         if (
-            candidate.case_context.present_hpo_terms
+            candidate.case_context
+            .present_hpo_terms
             != case.present_hpo_terms
         ):
             raise ValueError(
@@ -189,7 +295,8 @@ def load_real_case_input(
             )
 
         if (
-            candidate.case_context.absent_hpo_terms
+            candidate.case_context
+            .absent_hpo_terms
             != case.absent_hpo_terms
         ):
             raise ValueError(

@@ -8,11 +8,24 @@ from genomics_platform.interpretation.case_model import (
 from genomics_platform.ranking.benchmark.real_cases import (
     load_real_case_input,
 )
+from genomics_platform.ranking.benchmark.real_cases.snapshot import (
+    EvidenceSnapshotMetadata,
+    snapshot_candidate,
+)
 from test_case_model import make_candidate
 
 
 def _case_payload():
     candidate = make_candidate()
+
+    metadata = EvidenceSnapshotMetadata(
+        snapshot_date="2026-09-16",
+        pipeline_version="6e1a5e0",
+        source_versions={
+            "ClinVar": "test",
+            "gnomAD": "test",
+        },
+    )
 
     return {
         "schema_version": "0.1",
@@ -29,7 +42,10 @@ def _case_payload():
             ),
         },
         "candidates": [
-            candidate.to_dict(),
+            snapshot_candidate(
+                candidate,
+                metadata,
+            ),
         ],
         "provenance": {
             "source_name": "Public source",
@@ -95,6 +111,8 @@ def test_loader_rejects_truth_leakage(
     payload = _case_payload()
 
     payload["candidates"][0][
+        "candidate"
+    ][
         "is_causal"
     ] = True
 
@@ -167,5 +185,72 @@ def test_loader_rejects_absent_phenotype_mismatch(
     with pytest.raises(
         ValueError,
         match="absent HPO",
+    ):
+        load_real_case_input(path)
+
+
+def test_loader_rejects_direct_unsnapshotted_candidate(
+    tmp_path,
+):
+    payload = _case_payload()
+
+    payload["candidates"] = [
+        make_candidate().to_dict()
+    ]
+
+    path = _write_case(
+        tmp_path,
+        payload,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="snapshot_metadata",
+    ):
+        load_real_case_input(path)
+
+
+def test_loader_rejects_snapshot_truth_boundary(
+    tmp_path,
+):
+    payload = _case_payload()
+
+    payload["candidates"][0][
+        "semantic_boundaries"
+    ][
+        "benchmark_truth_present"
+    ] = True
+
+    path = _write_case(
+        tmp_path,
+        payload,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="benchmark_truth_present",
+    ):
+        load_real_case_input(path)
+
+
+def test_loader_rejects_snapshot_without_pipeline_version(
+    tmp_path,
+):
+    payload = _case_payload()
+
+    payload["candidates"][0][
+        "snapshot_metadata"
+    ][
+        "pipeline_version"
+    ] = ""
+
+    path = _write_case(
+        tmp_path,
+        payload,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="pipeline_version",
     ):
         load_real_case_input(path)
