@@ -6,7 +6,7 @@ import argparse
 import json
 from typing import Dict, Iterable, List, Optional
 
-from src.genomics_platform.evidence.disease_normalizer import (
+from genomics_platform.evidence.disease_normalizer import (
     normalize_disease,
 )
 

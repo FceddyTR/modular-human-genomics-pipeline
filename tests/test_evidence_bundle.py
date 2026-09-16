@@ -1,5 +1,5 @@
-from src.genomics_platform.evidence.evidence_bundle import EvidenceBundle
-from src.genomics_platform.evidence.evidence_record import EvidenceRecord
+from genomics_platform.evidence.evidence_bundle import EvidenceBundle
+from genomics_platform.evidence.evidence_record import EvidenceRecord
 
 
 bundle = EvidenceBundle(gene_symbol="TESTGENE")

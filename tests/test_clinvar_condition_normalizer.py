@@ -2,7 +2,7 @@
 
 import sqlite3
 
-from src.genomics_platform.evidence.clinvar_condition_normalizer import (
+from genomics_platform.evidence.clinvar_condition_normalizer import (
     canonicalize_clinvar_identifier,
     normalize_clinvar_condition,
 )

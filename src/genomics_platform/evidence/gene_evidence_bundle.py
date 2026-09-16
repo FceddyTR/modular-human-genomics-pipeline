@@ -8,13 +8,13 @@ from collections import Counter
 from pathlib import Path
 from typing import Dict, List
 
-from src.genomics_platform.evidence.disease_normalizer import (
+from genomics_platform.evidence.disease_normalizer import (
     normalize_disease,
 )
-from src.genomics_platform.evidence.hpo_store import (
+from genomics_platform.evidence.hpo_store import (
     query_gene as query_hpo_gene,
 )
-from src.genomics_platform.evidence.orphanet_store import (
+from genomics_platform.evidence.orphanet_store import (
     query_gene as query_orphanet_gene,
 )
 

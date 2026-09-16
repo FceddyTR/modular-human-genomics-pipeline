@@ -8,7 +8,7 @@ import urllib.parse
 import urllib.request
 from typing import Any, Dict, Iterable, List, Optional
 
-from src.genomics_platform.evidence.evidence_record import EvidenceRecord
+from genomics_platform.evidence.evidence_record import EvidenceRecord
 
 
 ADAPTER_VERSION = "0.1.0"

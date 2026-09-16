@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from src.genomics_platform.evidence.adapters.clinvar_vcf_parser import (
+from genomics_platform.evidence.adapters.clinvar_vcf_parser import (
     PARSER_VERSION,
     iter_clinvar_records,
 )

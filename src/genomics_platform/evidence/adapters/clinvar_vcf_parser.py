@@ -7,7 +7,7 @@ import gzip
 import json
 from typing import Dict, Iterable, List, Optional
 
-from src.genomics_platform.evidence.clinvar_record import (
+from genomics_platform.evidence.clinvar_record import (
     ClinVarCondition,
     ClinVarRecord,
     MolecularConsequence,

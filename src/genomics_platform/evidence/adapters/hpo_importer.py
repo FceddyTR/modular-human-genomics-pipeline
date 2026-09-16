@@ -9,7 +9,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional
 
-from src.genomics_platform.evidence.evidence_record import EvidenceRecord
+from genomics_platform.evidence.evidence_record import EvidenceRecord
 
 
 IMPORTER_VERSION = "0.1.0"

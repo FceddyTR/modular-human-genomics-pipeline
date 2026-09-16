@@ -9,7 +9,7 @@ import sqlite3
 from pathlib import Path
 from typing import Dict, List
 
-from src.genomics_platform.evidence.evidence_record import EvidenceRecord
+from genomics_platform.evidence.evidence_record import EvidenceRecord
 
 
 STORE_VERSION = "0.1.0"

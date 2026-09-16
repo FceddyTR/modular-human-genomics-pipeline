@@ -8,7 +8,7 @@ import sqlite3
 from pathlib import Path
 from typing import Dict, List
 
-from src.genomics_platform.evidence.adapters.orphanet_importer import (
+from genomics_platform.evidence.adapters.orphanet_importer import (
     IMPORTER_VERSION,
     iter_orphanet_records,
 )
